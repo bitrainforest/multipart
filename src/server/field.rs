@@ -124,6 +124,9 @@ pub struct FieldHeaders {
     /// should not be implicitly trusted. This crate makes no attempt to identify or validate
     /// the content-type of the actual field data.
     pub content_type: Option<Mime>,
+
+    /// The Range of this part, only available for multipart-range GET.
+    pub content_range: Option<String>,
 }
 
 impl FieldHeaders {
@@ -139,6 +142,7 @@ impl FieldHeaders {
             name: cont_disp.field_name.into(),
             filename: cont_disp.filename,
             content_type: parse_content_type(headers)?,
+            content_range: parse_content_range(headers),
         })
     }
 }
@@ -209,6 +213,16 @@ fn parse_content_type(headers: &[StrHeader]) -> Result<Option<Mime>, ParseHeader
         })?))
     } else {
         Ok(None)
+    }
+}
+
+fn parse_content_range(headers: &[StrHeader]) -> Option<String> {
+    if let Some(header) = find_header(headers, "Content-Range") {
+        // Boundary parameter will be parsed into the `Mime`
+        debug!("Found Content-Range: {:?}", header.val);
+        Some(header.val.to_string())
+    } else {
+        None
     }
 }
 
