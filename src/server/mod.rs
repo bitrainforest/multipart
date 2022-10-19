@@ -108,7 +108,7 @@ impl<R: Read> Multipart<R> {
     pub fn with_body<Bnd: Into<String>>(body: R, boundary: Bnd) -> Self {
         let boundary = boundary.into();
 
-        info!("Multipart::with_boundary(_, {:?})", boundary);
+        debug!("Multipart::with_boundary(_, {:?})", boundary);
 
         Multipart { 
             reader: BoundaryReader::from_reader(body, boundary),
